@@ -141,7 +141,7 @@ func LoadTSPLIB(filepath string) (*Instance, error) {
 	// Build instance
 	inst.NumCities = dimension
 
-	// Convert coords map to slice (TSPLIB uses 1-indexed nodes)
+	// Convert coords map to slice
 	coordSlice := make([][2]float64, dimension)
 	for i := 0; i < dimension; i++ {
 		if coord, ok := coords[i+1]; ok {

@@ -8,29 +8,19 @@ import (
 	"strings"
 	"time"
 
-	"heuristica/acs"
 	"heuristica/tsp"
 )
 
 func main() {
-	defaults := acs.DefaultParams()
-
 	// CLI flags
 	tspFile := flag.String("tsp", "", "Path to TSPLIB .tsp file (e.g., berlin52.tsp)")
-	iterations := flag.Int("iterations", defaults.Iterations, "Number of ACS iterations")
-	numAnts := flag.Int("ants", defaults.NumAnts, "Number of ants")
-	beta := flag.Float64("beta", defaults.Beta, "Beta parameter (heuristic weight)")
-	rho := flag.Float64("rho", defaults.Rho, "Rho parameter (local evaporation)")
-	alpha := flag.Float64("alpha", defaults.Alpha, "Alpha parameter (global evaporation)")
-	q0 := flag.Float64("q0", defaults.Q0, "Q0 parameter (exploitation probability)")
-	seed := flag.Int64("seed", 0, "Random seed (0 = use current time)")
 	verbose := flag.Bool("verbose", false, "Print detailed output")
 
 	flag.Parse()
 
 	if *tspFile == "" {
 		fmt.Fprintf(os.Stderr, "Error: must specify -tsp <file.tsp>\n")
-		fmt.Fprintf(os.Stderr, "Usage: %s -tsp <file.tsp> [options]\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Usage: %s -tsp <file.tsp> [-verbose]\n", os.Args[0])
 		os.Exit(1)
 	}
 
@@ -50,40 +40,13 @@ func main() {
 		} else {
 			fmt.Println("Optimal cost: unknown")
 		}
+		fmt.Printf("Algorithm: Farthest Insertion\n")
 		fmt.Println()
 	}
 
-	// Set up parameters
-	params := acs.Params{
-		NumAnts:    *numAnts,
-		Beta:       *beta,
-		Rho:        *rho,
-		Alpha:      *alpha,
-		Q0:         *q0,
-		Iterations: *iterations,
-	}
-
-	// Set seed
-	if *seed == 0 {
-		*seed = time.Now().UnixNano()
-	}
-
-	if *verbose {
-		fmt.Println("ACS Parameters:")
-		fmt.Printf("  Ants: %d\n", params.NumAnts)
-		fmt.Printf("  Beta: %.2f\n", params.Beta)
-		fmt.Printf("  Rho: %.2f\n", params.Rho)
-		fmt.Printf("  Alpha: %.2f\n", params.Alpha)
-		fmt.Printf("  Q0: %.2f\n", params.Q0)
-		fmt.Printf("  Iterations: %d\n", params.Iterations)
-		fmt.Printf("  Seed: %d\n", *seed)
-		fmt.Println()
-	}
-
-	// Run ACS
+	// Run Farthest Insertion heuristic
 	start := time.Now()
-	solver := acs.New(inst, params, *seed)
-	bestTour, bestLength := solver.Run()
+	bestTour, bestLength := tsp.FarthestInsertion(inst)
 	elapsed := time.Since(start)
 
 	// Calculate gap

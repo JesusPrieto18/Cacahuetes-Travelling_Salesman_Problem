@@ -43,7 +43,7 @@ func ILS(ciudades []models.City, maxIteraciones int) ([]models.City, float64) {
 			if costoActual < costoBest {
 				tourBest = utils.CopiarTour(tourActual)
 				costoBest = costoActual
-				fmt.Printf("   [Iter %d] ¡Nueva Mejor Solución! Costo: %.4f\n", iter, costoBest)
+				//fmt.Printf("   [Iter %d] ¡Nueva Mejor Solución! Costo: %.4f\n", iter, costoBest)
 			}
 		}
 	}

@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"path/filepath"
 	"os"
 	"time"
 	"tsp-ils/parser"
 	"tsp-ils/solver"
+	"tsp-ils/utils"
 )
 
 // Funcion main
@@ -50,6 +52,8 @@ func main() {
 	fmt.Printf("MEJOR COSTO FINAL: %.4f\n", mejorCosto)
 	fmt.Println("---------------------------------------------")
 
+	_ = mejorTour
+	/*
 	fmt.Print("Ruta Final: ")
 	for i, c := range mejorTour {
 		if i < 15 {
@@ -57,4 +61,34 @@ func main() {
 		}
 	}
 	fmt.Println("... ->", mejorTour[0].ID)
+	*/
+
+	// 4. CÁLCULO DEL GAP
+	optimo := utils.GetOptimalCost(archivo)
+	gap := 0.0
+	
+	if optimo > 0 {
+		fmt.Printf("Óptimo (BKS):    %.0f\n", optimo)
+		fmt.Printf("GAP:             %.2f%%\n", gap)
+		
+		// Interpretación rápida
+		if gap < 0.01 {
+			fmt.Println(">> ¡Resultado Óptimo encontrado!")
+		} else if gap < 5.0 {
+			fmt.Println(">> Resultado de alta calidad.")
+		}
+	} else {
+		fmt.Println("GAP: Desconocido (Instancia no registrada)")
+	}
+
+	fmt.Println("---------------------------------------------")
+	nombreArchivo := filepath.Base(archivo)
+
+	fmt.Printf("%s\t%s\n", nombreArchivo, elapsed)
+	fmt.Printf("%s\t%.4f\n", nombreArchivo, mejorCosto)
+	fmt.Printf("%s\t%.0f\n", nombreArchivo, optimo)
+	fmt.Printf("%s\t%.2f%%\n", nombreArchivo, gap)
+	
+	fmt.Println("---------------------------------------------")
+
 }

@@ -23,10 +23,10 @@ func main() {
 		archivo = os.Args[1]
 	}
 
-	fmt.Println("=============================================")
-	fmt.Printf(" PROYECTO TSP - ILS Solver\n")
-	fmt.Printf(" Buscando archivo en: %s\n", archivo)
-	fmt.Println("=============================================")
+	//fmt.Println("=============================================")
+	//fmt.Printf(" PROYECTO TSP - ILS Solver\n")
+	//fmt.Printf(" Buscando archivo en: %s\n", archivo)
+	//fmt.Println("=============================================")
 
 	// 1. Leer Archivo
 	ciudades, err := parser.LeerArchivoTSP(archivo)
@@ -36,8 +36,8 @@ func main() {
 		fmt.Println("Verificar que la carpeta 'Benchmark' exista.")
 		return
 	}
-	fmt.Printf("Cargado correctamente: %d ciudades.\n", len(ciudades))
-	fmt.Println("---------------------------------------------")
+	//fmt.Printf("Cargado correctamente: %d ciudades.\n", len(ciudades))
+	//fmt.Println("---------------------------------------------")
 
 	start := time.Now()
 
@@ -47,10 +47,10 @@ func main() {
 	elapsed := time.Since(start)
 
 	// 3. Resultados
-	fmt.Println("---------------------------------------------")
-	fmt.Printf("Tiempo de ejecución: %s\n", elapsed)
-	fmt.Printf("MEJOR COSTO FINAL: %.4f\n", mejorCosto)
-	fmt.Println("---------------------------------------------")
+	//fmt.Println("---------------------------------------------")
+	//fmt.Printf("Tiempo de ejecución: %s\n", elapsed)
+	//fmt.Printf("MEJOR COSTO FINAL: %.4f\n", mejorCosto)
+	//fmt.Println("---------------------------------------------")
 
 	_ = mejorTour
 	/*
@@ -68,17 +68,17 @@ func main() {
 	gap := 0.0
 	
 	if optimo > 0 {
-		fmt.Printf("Óptimo (BKS):    %.0f\n", optimo)
-		fmt.Printf("GAP:             %.2f%%\n", gap)
+		//fmt.Printf("Óptimo (BKS):    %.0f\n", optimo)
+		//fmt.Printf("GAP:             %.2f%%\n", gap)
 		
 		// Interpretación rápida
 		if gap < 0.01 {
-			fmt.Println(">> ¡Resultado Óptimo encontrado!")
+			//fmt.Println(">> ¡Resultado Óptimo encontrado!")
 		} else if gap < 5.0 {
-			fmt.Println(">> Resultado de alta calidad.")
+			//fmt.Println(">> Resultado de alta calidad.")
 		}
 	} else {
-		fmt.Println("GAP: Desconocido (Instancia no registrada)")
+		//fmt.Println("GAP: Desconocido (Instancia no registrada)")
 	}
 
 	fmt.Println("---------------------------------------------")

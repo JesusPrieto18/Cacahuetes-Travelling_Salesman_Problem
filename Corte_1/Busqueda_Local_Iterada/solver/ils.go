@@ -1,7 +1,6 @@
 package solver
 
 import (
-	"fmt"
 	"math/rand"
 	"tsp-ils/localsearch"
 	"tsp-ils/models"
@@ -20,7 +19,7 @@ func ILS(ciudades []models.City, maxIteraciones int) ([]models.City, float64) {
 
 	// Búsqueda Local Inicial
 	tourActual, costoActual := localsearch.TwoOpt(tourActual)
-	fmt.Printf("   >> Costo Inicial (2-Opt puro): %.4f\n", costoActual)
+	//fmt.Printf("   >> Costo Inicial (2-Opt puro): %.4f\n", costoActual)
 
 	tourBest := utils.CopiarTour(tourActual)
 	costoBest := costoActual

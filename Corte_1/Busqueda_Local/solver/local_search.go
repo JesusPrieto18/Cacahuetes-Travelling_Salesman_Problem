@@ -1,7 +1,6 @@
 package solver
 
 import (
-	"fmt"
 	"math/rand"
 	"tsp-ils/localsearch"
 	"tsp-ils/models"
@@ -20,8 +19,8 @@ func LocalSearch(ciudades []models.City) ([]models.City, float64) {
 		tourActual[i], tourActual[j] = tourActual[j], tourActual[i]
 	})
 
-	costoInicial := utils.CalcularCostoTotal(tourActual)
-	fmt.Printf("   >> Costo Inicial (Aleatorio): %.4f\n", costoInicial)
+	//costoInicial := utils.CalcularCostoTotal(tourActual)
+	//fmt.Printf("   >> Costo Inicial (Aleatorio): %.4f\n", costoInicial)
 
 	// Aplicar 2-Opt
 	mejorTour, mejorCosto := localsearch.TwoOpt(tourActual)

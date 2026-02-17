@@ -41,9 +41,3 @@ Algunos parámetros pueden estar configurados dentro del código fuente (`sa_sol
 - Temperatura inicial
 - Factor de enfriamiento
 - Número de iteraciones
-
-## Salida
-El programa mostrará en consola la mejor ruta encontrada y su costo total.
-
-## Créditos
-Desarrollado para la materia de Optimización de Rutas.

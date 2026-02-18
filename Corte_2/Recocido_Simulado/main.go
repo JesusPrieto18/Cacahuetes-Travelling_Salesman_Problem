@@ -1,29 +1,38 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math/rand"
 	"path/filepath"
-	"os"
 	"time"
-	"tsp-ils/parser"
-	"tsp-ils/solver"
-	"tsp-ils/utils"
+	"tsp-sa/parser"
+	"tsp-sa/simulatedannealing"
+	"tsp-sa/solver"
+	"tsp-sa/utils"
 )
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
+	initialTemp := flag.Float64("temp", 1000.0, "Temperatura Inicial del Recocido")
+	alpha := flag.Float64("alpha", 0.995, "Factor de enfriamiento (Alpha)")
+	minTemp := flag.Float64("min_temp", 0.001, "Temperatura mínima de parada")
+	iterPerTemp := flag.Int("iter", 1000, "Iteraciones por nivel de temperatura")
+
+	// Parsear los argumentos de la línea de comandos
+	flag.Parse()
+
 	// Ruta por defecto o por argumento
 	archivo := "../Benchmark/berlin52.tsp" 
-	if len(os.Args) > 1 {
-		archivo = os.Args[1]
+	args := flag.Args()
+	if len(args) > 0 {
+		archivo = args[0]
 	}
 
-	//fmt.Println("=============================================")
-	//fmt.Printf(" PROYECTO TSP - LS Solver with 2-Opt\n")
-	//fmt.Printf(" Buscando archivo: %s\n", archivo)
-	//fmt.Println("=============================================")
+	// Imprimir configuración para verificar
+	fmt.Printf("Configuración SA: Temp=%.2f, Alpha=%.4f, Min=%.4f, Iter=%d\n", 
+		*initialTemp, *alpha, *minTemp, *iterPerTemp)	
 
 	// 1. Leer Archivo
 	ciudades, err := parser.LeerArchivoTSP(archivo)
@@ -33,18 +42,22 @@ func main() {
 		fmt.Println("Verificar que la carpeta 'Benchmark' exista.")
 		return
 	}
-	//fmt.Printf("Cargado correctamente: %d ciudades.\n", len(ciudades))
-	//fmt.Println("---------------------------------------------")
 
+	configSA := simulatedannealing.SAConfig{
+		InitialTemp: *initialTemp,
+		Alpha:       *alpha,
+		MinTemp:     *minTemp,
+		IterPerTemp: *iterPerTemp,
+	}
 	start := time.Now()
 
-	// 2. Ejecutar Algoritmo
+	// Ejecutar Algoritmo
 	mejorTourLS, mejorCostoLS := solver.LocalSearch(ciudades)
-	mejorTourSA, mejorCostoSA := solver.SimulatedAnnealingSolver(mejorTourLS, mejorCostoLS)
+	mejorTourSA, mejorCostoSA := solver.SimulatedAnnealingSolver(mejorTourLS, mejorCostoLS, configSA)
 	
 	elapsed := time.Since(start)
 
-	// 3. CÁLCULO DEL GAP
+	// CÁLCULO DEL GAP
 	optimo := utils.GetOptimalCost(archivo)
 	//gapLS := 0.0
 	gapSA := 0.0
@@ -54,39 +67,14 @@ func main() {
 		gapSA = (mejorCostoSA - optimo) / optimo * 100
 	}
 
-	// Imprimimos en formato tabla para comparar
-	// Formato: Archivo | TiempoTotal | CostoLS (Gap) | CostoSA (Gap) | Optimo
+	// Imprimimos en formato tabla 
 	nombreArchivo := filepath.Base(archivo)
-	/*
-	fmt.Println("---------------------------------------------------------------------------------")
-	fmt.Printf("Instancia: %s\n", nombreArchivo)
-	fmt.Printf("Tiempo Total: %s\n", elapsed)
-	fmt.Println("---------------------------------------------------------------------------------")
-	fmt.Printf("%-10s | %-10s | %-10s\n", "Metodo", "Costo", "GAP (%)")
-	fmt.Println("---------------------------------------------------------------------------------")
-	
-	if optimo > 0 {
-		fmt.Printf("2-Opt      | %.4f  | %.2f%%\n", mejorCostoLS, gapLS)
-		fmt.Printf("Sim. Ann.  | %.4f  | %.2f%%\n", mejorCostoSA, gapSA)
-		fmt.Printf("BKS        | %.0f       | 0.00%%\n", optimo)
-	} else {
-		fmt.Printf("2-Opt      | %.4f  | N/A\n", mejorCostoLS)
-		fmt.Printf("Sim. Ann.  | %.4f  | N/A\n", mejorCostoSA)
-	}
-	fmt.Println("---------------------------------------------------------------------------------")
-	*/
-	// Evitar errores de variable no usada
+
 	_ = mejorTourSA
 
 	
-	fmt.Printf("%s\n", nombreArchivo)
+	fmt.Printf("Benchmark: %s\n", nombreArchivo)
 	fmt.Printf("%-10s\t%-10s\t%-6s\t%-10s\n", "Tiempo", "Costo", "Optimo", "GAP SA (%)")
 	fmt.Printf("%s\t%.4f\t%.0f\t%.2f\n", elapsed, mejorCostoSA, optimo, gapSA)
-	//fmt.Printf("%s\t%s\n", nombreArchivo, elapsed)
-	//fmt.Printf("%s\t%.4f\n", nombreArchivo, mejorCostoSA)
-	//fmt.Printf("%s\t%.0f\n", nombreArchivo, optimo)
-	//fmt.Printf("%s\t%.2f%%\n", nombreArchivo, gapSA)
-	
-	//fmt.Println("---------------------------------------------")
 
 }

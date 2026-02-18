@@ -2,9 +2,9 @@ package solver
 
 import (
 	"math/rand"
-	"tsp-ils/localsearch"
-	"tsp-ils/models"
-	"tsp-ils/utils"
+	"tsp-sa/localsearch"
+	"tsp-sa/models"
+	"tsp-sa/utils"
 )
 
 // LocalSearch ejecuta el algoritmo de Búsqueda

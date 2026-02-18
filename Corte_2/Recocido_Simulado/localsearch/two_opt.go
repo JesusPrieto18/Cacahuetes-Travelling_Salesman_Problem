@@ -1,8 +1,8 @@
 package localsearch
 
 import (
-	"tsp-ils/models"
-	"tsp-ils/utils"
+	"tsp-sa/models"
+	"tsp-sa/utils"
 )
 
 // Funcion 2 opt para busqueda local

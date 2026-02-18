@@ -2,7 +2,7 @@ package utils
 
 import (
 	"math"
-	"tsp-ils/models"
+	"tsp-sa/models"
 )
 
 // Funcion para calcular la distancia euclidiana entre dos ciudades

@@ -3,8 +3,8 @@ package simulatedannealing
 import (
 	"math"
 	"math/rand"
-	"tsp-ils/models"
-	"tsp-ils/utils"
+	"tsp-sa/models"
+	"tsp-sa/utils"
 )
 
 // Configuración de parámetros para SA

@@ -70,7 +70,7 @@ func main() {
 	_ = mejorTourSA
 
 	if *flat {
-		fmt.Printf("%s\t%s\t%.0f\t%.0f\t%.2f\t%.2f\t%.4f\t%.4f\t%d\n", nombreArchivo, elapsed, mejorCostoSA, optimo, gapSA, *initialTemp, *alpha, *minTemp, *iterPerTemp)
+		fmt.Printf("%s\t%s\t%.4f\t%.0f\t%.2f\t%.2f\t%.4f\t%.4f\t%d\n", nombreArchivo, elapsed, mejorCostoSA, optimo, gapSA, *initialTemp, *alpha, *minTemp, *iterPerTemp)
 	} else {
 		fmt.Printf("%-10s\t%-10s\t%-10s\t%-6s\t%-10s\n", "Benchmark", "Tiempo", "Costo", "Optimo", "GAP SA (%)")
 		fmt.Printf("%s\t%s\t%.4f\t%.0f\t%.2f\n", nombreArchivo,elapsed, mejorCostoSA, optimo, gapSA)

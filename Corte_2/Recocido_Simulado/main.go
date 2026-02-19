@@ -19,7 +19,8 @@ func main() {
 	alpha := flag.Float64("alpha", 0.995, "Factor de enfriamiento (Alpha)")
 	minTemp := flag.Float64("min_temp", 0.001, "Temperatura mínima de parada")
 	iterPerTemp := flag.Int("iter", 1000, "Iteraciones por nivel de temperatura")
-
+	flat := flag.Bool("flat", false, "Mostrar informacion en formato plano (sin encabezados)")
+	
 	// Parsear los argumentos de la línea de comandos
 	flag.Parse()
 
@@ -29,10 +30,6 @@ func main() {
 	if len(args) > 0 {
 		archivo = args[0]
 	}
-
-	// Imprimir configuración para verificar
-	fmt.Printf("Configuración SA: Temp=%.2f, Alpha=%.4f, Min=%.4f, Iter=%d\n", 
-		*initialTemp, *alpha, *minTemp, *iterPerTemp)	
 
 	// 1. Leer Archivo
 	ciudades, err := parser.LeerArchivoTSP(archivo)
@@ -72,9 +69,13 @@ func main() {
 
 	_ = mejorTourSA
 
-	
-	fmt.Printf("Benchmark: %s\n", nombreArchivo)
-	fmt.Printf("%-10s\t%-10s\t%-6s\t%-10s\n", "Tiempo", "Costo", "Optimo", "GAP SA (%)")
-	fmt.Printf("%s\t%.4f\t%.0f\t%.2f\n", elapsed, mejorCostoSA, optimo, gapSA)
+	if *flat {
+		fmt.Printf("%s\t%s\t%.0f\t%.0f\t%.2f\t%.2f\t%.4f\t%.4f\t%d\n", nombreArchivo, elapsed, mejorCostoSA, optimo, gapSA, *initialTemp, *alpha, *minTemp, *iterPerTemp)
+	} else {
+		fmt.Printf("%-10s\t%-10s\t%-10s\t%-6s\t%-10s\n", "Benchmark", "Tiempo", "Costo", "Optimo", "GAP SA (%)")
+		fmt.Printf("%s\t%s\t%.4f\t%.0f\t%.2f\n", nombreArchivo,elapsed, mejorCostoSA, optimo, gapSA)
+		fmt.Printf("Configuración SA: Temp=%.2f, Alpha=%.4f, Min=%.4f, Iter=%d\n", 
+		*initialTemp, *alpha, *minTemp, *iterPerTemp)	
+	}
 
 }

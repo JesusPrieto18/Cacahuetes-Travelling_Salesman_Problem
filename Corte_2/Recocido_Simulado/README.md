@@ -43,17 +43,22 @@ go run main.go ../Benchmark/berlin52.tsp -temp=1000 -alpha=0.995 -min_temp=0.001
 ```
 
 ## Parámetros por línea de comandos
-- `-temp`: Temperatura inicial del recocido (float).
-- `-alpha`: Factor de enfriamiento (float, <1).
-- `-min_temp`: Temperatura mínima de parada (float).
-- `-iter`: Iteraciones por nivel de temperatura (int).
+ `-flat`: Si se activa (`-flat=true`), la salida será en formato plano/tabulado, sin encabezados ni descripciones, ideal para procesamiento automático o scripts. Si no se usa, la salida será más legible para humanos, con encabezados y detalles.
 
 ## Ejemplo de salida
-El programa mostrará en consola la mejor ruta encontrada, su costo total, el óptimo (si está disponible) y el GAP:
+El programa mostrará en consola la mejor ruta encontrada, su costo total, el óptimo (si está disponible) y el GAP.
 
+**Salida por defecto (legible para humanos):**
 ```
+Benchmark  Tiempo      Costo      Optimo  GAP SA (%)
+berlin52.tsp 0.123456s 7542.0     7542    0.00
 Configuración SA: Temp=1000.00, Alpha=0.9950, Min=0.0010, Iter=1000
-Benchmark: berlin52.tsp
-Tiempo     	Costo     	Optimo	GAP SA (%)
-0.123456s	7542.0	    7542	0.00
 ```
+
+**Salida con `-flat` (formato plano):**
+```
+berlin52.tsp\t0.123456s\t7542\t7542\t0.00\t1000.00\t0.9950\t0.0010\t1000
+```
+
+
+Cada columna sera: Benchmark|Tiempo|Costo|Optimo|GAP SA (%)|Temperatura|Alpha|Minimo|Iteraciones

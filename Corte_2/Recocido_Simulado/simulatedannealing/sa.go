@@ -3,8 +3,8 @@ package simulatedannealing
 import (
 	"math"
 	"math/rand"
-	"tsp-sa/models"
-	"tsp-sa/utils"
+	"tsp-common/models"
+	"tsp-common/utils"
 )
 
 // Configuración de parámetros para SA
@@ -35,24 +35,17 @@ func EjecutarSA(tourInicial []models.City, config SAConfig) ([]models.City, floa
 		for k := 0; k < config.IterPerTemp; k++ {
 			
 			// A. Generar vecino aleatorio (Movimiento 2-Opt aleatorio)
-			// Seleccionamos dos índices al azar i y j
 			i := rand.Intn(n)
 			j := rand.Intn(n)
 
-			// Aseguramos que i < j para facilitar la inversión
 			if i > j {
 				i, j = j, i
 			}
-			// Evitamos invertir el tour completo o segmentos nulos
 			if i == j || (i == 0 && j == n-1) {
 				continue
 			}
 
 			// B. Calcular Delta E (Cambio de costo)
-			// Optimización: Calculamos solo la diferencia de aristas, no el tour completo
-			// Aristas eliminadas: (i-1 -> i) y (j -> j+1)
-			// Aristas nuevas:     (i-1 -> j) y (i -> j+1)
-			
 			idxPrevI := (i - 1 + n) % n
 			idxNextJ := (j + 1) % n
 
@@ -67,10 +60,8 @@ func EjecutarSA(tourInicial []models.City, config SAConfig) ([]models.City, floa
 			// Criterio de Aceptación (Metropolis)
 			aceptar := false
 			if delta < 0 {
-				// Mejora: Aceptar siempre
 				aceptar = true
 			} else {
-				// Empeora: Aceptar con probabilidad e^(-delta/T)
 				prob := math.Exp(-delta / tempActual)
 				if rand.Float64() < prob {
 					aceptar = true
@@ -82,7 +73,6 @@ func EjecutarSA(tourInicial []models.City, config SAConfig) ([]models.City, floa
 				invertirSegmento(tourActual, i, j)
 				costoActual += delta
 
-				// Actualizar el mejor global encontrado
 				if costoActual < mejorCosto {
 					mejorCosto = costoActual
 					mejorTour = utils.CopiarTour(tourActual)

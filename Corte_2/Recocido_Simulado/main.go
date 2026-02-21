@@ -6,10 +6,10 @@ import (
 	"math/rand"
 	"path/filepath"
 	"time"
-	"tsp-sa/parser"
+	"tsp-common/parser"
+	"tsp-common/utils"
 	"tsp-sa/simulatedannealing"
 	"tsp-sa/solver"
-	"tsp-sa/utils"
 )
 
 func main() {

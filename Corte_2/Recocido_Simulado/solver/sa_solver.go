@@ -1,7 +1,7 @@
 package solver
 
 import (
-	"tsp-sa/models"
+	"tsp-common/models"
 	"tsp-sa/simulatedannealing"
 )
 

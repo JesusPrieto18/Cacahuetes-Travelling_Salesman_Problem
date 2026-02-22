@@ -13,8 +13,8 @@ type Candidate struct {
 	index int
 }
 
-type AlphaOption struct {
-	value   float64
+type Alpha struct { //
+	Value   float64
 	costSum float64
 	uses    int
 	prob    float64

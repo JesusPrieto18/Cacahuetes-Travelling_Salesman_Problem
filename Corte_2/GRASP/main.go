@@ -3,20 +3,19 @@ package main
 import (
 	"flag"
 	"fmt"
-	"math/rand"
 	"os"
 	"text/tabwriter"
 	"time"
-	"tsp-sa/grasp"
+	"math/rand"
 	"tsp-sa/parser"
+	"tsp-sa/grasp"
 	"tsp-sa/utils"
 )
 
 func main() {
 	// Configuracion inicial y semilla de aleatoriedad
 	rand.Seed(time.Now().UnixNano())
-	file := "../Benchmark/bier127.tsp"
-	flag.Parse()
+	file := "../Benchmark/berlin52.tsp" 
 	args := flag.Args()
 	if len(args) > 0 {
 		file = args[0]
@@ -31,21 +30,11 @@ func main() {
 		return
 	}
 
-	// Inicializar alpha
-	var alpha grasp.Alpha = grasp.Alpha{Value: 0.0} // si no se pasa argumento, se usara 0.0 (greedy puro)
-	if len(args) > 1 {
-		fmt.Sscanf(args[1], "%f", &alpha.Value)
-		if alpha.Value < 0 || alpha.Value > 1 {
-			fmt.Printf("Valor de alpha fuera de rango (0.0 - 1.0). Usando valor por defecto 0.0.\n")
-			alpha.Value = 0.0
-		}
-	}
-
-	fmt.Printf("Iniciando GRASP Reactivo para %d ciudades con alpha = %.2f...\n", len(cities), alpha.Value)
+	fmt.Printf("Iniciando GRASP Reactivo para %d ciudades...\n", len(cities))
 
 	// GraspReactivo coordinara la construccion, el sesgo, el inicio aleatorio y el 2-opt
 	start := time.Now()
-	bestTour, bestCost := grasp.GraspReactivo(cities, 1000, &alpha)
+	bestTour, bestCost := grasp.GraspReactivo(cities, 1000)
 	elapsed := time.Since(start)
 
 	// CALCULO DEL GAP
@@ -65,13 +54,13 @@ func printTable(name string, tiempo time.Duration, result float64, optimo float6
 	w := tabwriter.NewWriter(os.Stdout, 8, 0, 2, ' ', tabwriter.Debug)
 
 	fmt.Fprintln(w, "Instancia\tTiempo\tResultado\tOptimo\tGAP (%)")
-
-	line := fmt.Sprintf("%s\t%v\t%.2f\t%.2f\t%.2f",
-		name,
+	
+	line := fmt.Sprintf("%s\t%v\t%.2f\t%.2f\t%.2f", 
+		name, 
 		tiempo.Round(time.Millisecond), // Redondear tiempo para limpieza (quitar de ser necesario)
 		result, optimo, gap)
-
+	
 	fmt.Fprintln(w, line)
-
+	
 	w.Flush()
 }

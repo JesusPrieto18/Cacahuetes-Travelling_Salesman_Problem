@@ -155,7 +155,6 @@ func RunGA(cities []models.City, config GAConfig) GAResult {
 	totalGens := 0
 	stopReason := "max_generaciones"
 
-	// 2. Generational loop
 	for gen := 0; gen < config.Generations; gen++ {
 		totalGens = gen + 1
 
@@ -163,53 +162,27 @@ func RunGA(cities []models.City, config GAConfig) GAResult {
 		offspring := make([]Individual, 0, config.PopSize)
 
 		for len(offspring) < config.PopSize {
-			// Select parents by tournament
-			parent1 := TournamentSelection(population, config.TournamentSize)
-			parent2 := TournamentSelection(population, config.TournamentSize)
+			// 1. Seleccionar múltiples padres (Inciso A)
+			parents := make([][]int, config.NumParents)
+			for p := 0; p < config.NumParents; p++ {
+				parents[p] = TournamentSelection(population, config.TournamentSize).Tour
+			}
 
-			// Cut and Fill crossover
-			child1Tour, child2Tour := CutAndFillCrossover(parent1.Tour, parent2.Tour)
+			// 2. Cruce Multipadre DPX
+			childTour := DPXMultiParentCrossover(parents, cities) 
 
-			// Inversion mutation with probability MutationRate
+			// 3. Mutación (Double-Bridge)
 			if rand.Float64() < config.MutationRate {
-				InversionMutation(child1Tour)
-			}
-			if rand.Float64() < config.MutationRate {
-				InversionMutation(child2Tour)
+				childTour = DoubleBridgeMutation(childTour)
 			}
 
-			// Evaluate offspring
-			//child1 := Individual{Tour: child1Tour, Cost: EvaluateCost(child1Tour, cities)}
-			//child2 := Individual{Tour: child2Tour, Cost: EvaluateCost(child2Tour, cities)}
-			/*
-			offspring = append(offspring, child1)
-			if len(offspring) < config.PopSize {
-				offspring = append(offspring, child2)
-			}
-			*/
-
-			offspring := make([]Individual, 0, config.PopSize)
-
-			for len(offspring) < config.PopSize {
-				// 1. Seleccionar múltiples padres (Inciso A)
-				parents := make([][]int, config.NumParents)
-				for p := 0; p < config.NumParents; p++ {
-					parents[p] = TournamentSelection(population, config.TournamentSize).Tour
-				}
-
-				// 2. Cruce Multipadre DPX
-				childTour := DPXMultiParentCrossover(parents, cities) // Usamos nuestra nueva función DPX
-
-				// 3. Mutación (Double-Bridge)
-				if rand.Float64() < config.MutationRate {
-					childTour = DoubleBridgeMutation(childTour)
-				}
-
-				// 4. BÚSQUEDA LOCAL (EL NÚCLEO DEL ALGORITMO MEMÉTICO - Inciso B)
-				childTourOpt, childCost := localsearch.TwoOpt(childTour, cities)
-				// 5. Evaluar hijo YA OPTIMIZADO y añadirlo
-				offspring = append(offspring, Individual{Tour: childTourOpt, Cost: childCost})			}
+			// 4. BÚSQUEDA LOCAL (EL NÚCLEO DEL ALGORITMO MEMÉTICO - Inciso B)
+			childTourOpt, childCost := localsearch.TwoOpt(childTour, cities)
+			
+			// 5. Evaluar hijo YA OPTIMIZADO y añadirlo
+			offspring = append(offspring, Individual{Tour: childTourOpt, Cost: childCost})
 		}
+		
 
 		// (μ+λ) survivor selection: merge population + offspring, keep best PopSize
 		combined := make([]Individual, 0, len(population)+len(offspring))

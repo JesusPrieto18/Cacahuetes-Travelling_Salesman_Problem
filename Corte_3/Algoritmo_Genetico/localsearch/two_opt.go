@@ -3,24 +3,21 @@ package localsearch
 import (
 	"tsp-meme/models"
 	"tsp-meme/utils"
+	"fmt"
 )
 
-// Funcion 2 opt para busqueda local (Adaptada para usar genotipos []int)
+// Funcion 2 opt para busqueda local (Adaptada y protegida contra bucles)
 func TwoOpt(tour []int, cities []models.City) ([]int, float64) {
-	// Copiar el tour para no modificar el original directamente
 	mejorTour := make([]int, len(tour))
 	copy(mejorTour, tour)
-	
-	// Calcular costo inicial (asumiendo que tienes EvaluateCost o iteramos)
-	mejorCosto := calcularCosto(mejorTour, cities) 
+
 	mejorado := true
 	n := len(tour)
-
+	fmt.Println("Iniciando 2-opt con tolerancia para un individuo...")
 	for mejorado {
 		mejorado = false
 		for i := 1; i < n-1; i++ {
 			for j := i + 1; j < n; j++ {
-				// Buscar las distancias usando los índices del tour sobre el arreglo de ciudades
 				d1 := utils.DistanciaEuclidiana(cities[mejorTour[i-1]], cities[mejorTour[i]])
 				d2 := utils.DistanciaEuclidiana(cities[mejorTour[j]], cities[mejorTour[(j+1)%n]])
 				costoActual := d1 + d2
@@ -29,18 +26,22 @@ func TwoOpt(tour []int, cities []models.City) ([]int, float64) {
 				d4 := utils.DistanciaEuclidiana(cities[mejorTour[i]], cities[mejorTour[(j+1)%n]])
 				costoNuevo := d3 + d4
 
-				if costoNuevo < costoActual {
+				// EL ARREGLO ESTÁ AQUÍ: Añadimos un margen de tolerancia (0.0001)
+				if (costoActual - costoNuevo) > 0.0001 {
 					invertirSegmento(mejorTour, i, j)
-					mejorCosto -= (costoActual - costoNuevo)
 					mejorado = true
 				}
 			}
 		}
 	}
-	return mejorTour, mejorCosto
+	
+	// Calculamos el costo final directamente del tour terminado para evitar
+	// arrastrar errores de precisión acumulados en restas anteriores.
+	mejorCostoFinal := calcularCosto(mejorTour, cities)
+	
+	return mejorTour, mejorCostoFinal
 }
 
-// Funcion para invertir un segmento del tour basado en índices enteros
 func invertirSegmento(tour []int, i, j int) {
 	for i < j {
 		tour[i], tour[j] = tour[j], tour[i]
@@ -49,7 +50,6 @@ func invertirSegmento(tour []int, i, j int) {
 	}
 }
 
-// Función auxiliar rápida para calcular el costo base en la búsqueda local
 func calcularCosto(tour []int, cities []models.City) float64 {
 	total := 0.0
 	n := len(tour)

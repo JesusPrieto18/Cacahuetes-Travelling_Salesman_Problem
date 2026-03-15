@@ -24,6 +24,18 @@ go build -o tsp-ds .
 go run . ../Benchmark/kroA100.tsp
 ```
 
+### Benchmarks masivos
+
+```bash
+# Ejecutar todas las instancias con parametros por defecto
+./run_benchmarks.sh
+
+# Ejecutar con parametros personalizados via variables de entorno
+POP=1000 GEN=800 MUT=0.25 TOURN=5 STAG=150 RELINK=0.4 DIVTHRESH=7 ./run_benchmarks.sh
+```
+
+El script genera el archivo `resultados_ds.csv`.
+
 ## Parametros
 
 | Flag    | Tipo    | Default | Descripcion                                              |
@@ -33,16 +45,21 @@ go run . ../Benchmark/kroA100.tsp
 | `-mut`  | float64 | 0.3     | Probabilidad de mutacion (0.0 a 1.0)                    |
 | `-tourn`| int     | 3       | Tamaño del torneo para seleccion de padres               |
 | `-stag` | int     | 200     | Generaciones sin mejora antes de parar (0 = desactivado) |
-| `-flat` | bool    | false   | Salida en formato plano separado por tabs (sin encabezados) |
+| `-relink` | float64 | 0.5   | Porcentaje de pares de soluciones a reenlazar por generacion |
+| `-divthresh` | int | 5      | Distancia minima en aristas para aceptar un individuo     |
+| `-flat` | bool    | false   | Salida en formato plano separado por comas (sin encabezados) |
 
 ### Ejemplos
 
 ```bash
 # Configuracion personalizada
-./tsp-ds -pop 1000 -gen 800 -mut 0.25 -tourn 5 ../Benchmark/berlin52.tsp
+./tsp-ds -pop 1000 -gen 800 -mut 0.25 -tourn 5 -relink 0.4 -divthresh 7 ../Benchmark/berlin52.tsp
 
 # Desactivar parada por estancamiento
 ./tsp-ds -stag 0 ../Benchmark/eil76.tsp
+
+# Ajustar intensidad del relinking y filtro de diversidad
+./tsp-ds -relink 0.6 -divthresh 10 ../Benchmark/kroA100.tsp
 
 # Salida plana (util para scripts y pipelines)
 ./tsp-ds -flat ../Benchmark/kroA100.tsp
@@ -85,11 +102,25 @@ Se escogen dos posiciones aleatorias `i` y `j` y se invierte el segmento entre e
 
 Se aplica con probabilidad configurable (`-mut`).
 
-### 6. Seleccion de Sobrevivientes — (μ+λ)
+### 6. Reenlace de Caminos (Path Relinking)
+
+La busqueda dispersa incorpora una fase de **path relinking** configurable con `-relink`.
+En cada generacion se toma un porcentaje de pares de soluciones y se exploran trayectorias entre ellas para construir individuos intermedios de alta calidad.
+
+Esta fase intensifica la busqueda en regiones prometedoras del espacio de soluciones sin abandonar por completo la diversidad poblacional.
+
+### 7. Control de Diversidad
+
+Para evitar convergencia prematura, un individuo nuevo solo se acepta si mantiene una distancia minima respecto a la poblacion actual.
+Ese umbral se controla con `-divthresh` y se mide en diferencias de aristas del tour.
+
+Valores bajos favorecen explotacion; valores mas altos favorecen exploracion.
+
+### 8. Seleccion de Sobrevivientes — (μ+λ)
 
 En cada generacion se unen la poblacion actual (μ) con los hijos generados (λ), se ordenan por costo y se seleccionan los mejores `PopSize` individuos. Esto es mas robusto que el reemplazo generacional puro porque nunca pierde buenas soluciones.
 
-### 7. Criterios de Terminacion
+### 9. Criterios de Terminacion
 
 El algoritmo se detiene cuando se cumple **cualquiera** de estas condiciones:
 
@@ -99,7 +130,7 @@ El algoritmo se detiene cuando se cumple **cualquiera** de estas condiciones:
 ## Estructura del Proyecto
 
 ```
-Algoritmo_Genetico/
+Busqueda_Dispersa/
 ├── main.go                        # Punto de entrada, flags y salida
 ├── go.mod                         # Modulo Go
 ├── models/
@@ -110,6 +141,7 @@ Algoritmo_Genetico/
 │   ├── ga.go                      # Logica principal del AG (poblacion, bucle, reemplazo)
 │   ├── crossover.go               # Cruce Corte y Llenado (Order Crossover)
 │   ├── mutation.go                # Mutacion por Inversion
+│   ├── relinking.go               # Path relinking entre soluciones prometedoras
 │   ├── selection.go               # Seleccion por Torneo
 │   └── heuristic.go               # Heuristica Farthest Insertion
 ├── solver/
@@ -124,15 +156,16 @@ Algoritmo_Genetico/
 ### Formato normal (por defecto)
 
 ```
-Benchmark   Tiempo      Costo       Optimo  GAP GA (%)
+Benchmark   Tiempo      Costo       Optimo  GAP AM (%)
 berlin52.tsp  143ms     7701.4556   7542    2.11
-Configuracion GA: Pop=600, Gen=2000, Mut=0.3000, Tourn=3, Stag=200
+Configuracion AM: Pop=600, Gen=2000, Mut=0.3000, Tourn=3, Stag=200, Relink=0.50, DivThresh=5
+Convergencia: ultima mejora en gen 184, parada en gen 384 por stagnation_limit
 ```
 
 ### Formato plano (`-flat`)
 
-Columnas separadas por tab, sin encabezados (una linea):
+Columnas separadas por comas, sin encabezados (una linea):
 
 ```
-Archivo  Tiempo  Costo  Optimo  GAP  Pop  Gen  Mut  Tourn  Stag
+Archivo,Costo,Tiempo,Optimo,GAP,Pop,Gen,Mut,Tourn,Stag,Relink,DivThresh,GenUltimaMejora,GenParada,RazonParada
 ```

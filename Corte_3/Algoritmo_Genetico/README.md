@@ -24,6 +24,18 @@ go build -o tsp-meme .
 go run . ../Benchmark/kroA100.tsp
 ```
 
+### Benchmarks masivos
+
+```bash
+# Ejecutar todas las instancias con parametros por defecto
+./run_benchmarks.sh
+
+# Ejecutar con parametros personalizados via variables de entorno
+POP=1000 GEN=800 MUT=0.25 TOURN=5 STAG=150 PARENTS=4 ./run_benchmarks.sh
+```
+
+El script genera el archivo `resultados_meme.csv`.
+
 ## Parametros
 
 | Flag    | Tipo    | Default | Descripcion                                              |
@@ -33,16 +45,20 @@ go run . ../Benchmark/kroA100.tsp
 | `-mut`  | float64 | 0.3     | Probabilidad de mutacion (0.0 a 1.0)                    |
 | `-tourn`| int     | 3       | Tamaño del torneo para seleccion de padres               |
 | `-stag` | int     | 200     | Generaciones sin mejora antes de parar (0 = desactivado) |
-| `-flat` | bool    | false   | Salida en formato plano separado por tabs (sin encabezados) |
+| `-parents` | int  | 3       | Numero de padres usados en la recombinacion (>= 3)       |
+| `-flat` | bool    | false   | Salida en formato plano separado por comas (sin encabezados) |
 
 ### Ejemplos
 
 ```bash
 # Configuracion personalizada
-./tsp-meme -pop 1000 -gen 800 -mut 0.25 -tourn 5 ../Benchmark/berlin52.tsp
+./tsp-meme -pop 1000 -gen 800 -mut 0.25 -tourn 5 -parents 4 ../Benchmark/berlin52.tsp
 
 # Desactivar parada por estancamiento
 ./tsp-meme -stag 0 ../Benchmark/eil76.tsp
+
+# Ajustar cantidad de padres en la recombinacion
+./tsp-meme -parents 5 ../Benchmark/kroA100.tsp
 
 # Salida plana (util para scripts y pipelines)
 ./tsp-meme -flat ../Benchmark/kroA100.tsp
@@ -69,9 +85,14 @@ Se aplica **control de diversidad**: individuos con costos duplicados se descart
 
 Se seleccionan `k` individuos al azar de la poblacion y el de menor costo (mejor aptitud) se elige como padre. Los individuos peores tienen probabilidad positiva de ser seleccionados si compiten contra otros aun peores, lo que mantiene diversidad.
 
-### 4. Cruce — Corte y Llenado (Order Crossover)
+### 4. Cruce — Recombinacion con Multiples Padres
 
-Operador descrito en Clase 6:
+El algoritmo admite recombinacion con `N` padres mediante el parametro `-parents`.
+Cuando `N = 3` se usa la configuracion por defecto, y pueden probarse valores mayores para explorar mas diversidad genetica.
+
+La seleccion de padres sigue siendo por torneo y luego se combinan sus permutaciones para generar descendencia valida.
+
+Como base, la construccion respeta el principio de Order Crossover:
 
 1. Se elige un punto de corte `p` aleatorio.
 2. **Hijo 1:** Copia el prefijo `padre1[0..p)`, luego recorre `padre2` en orden y agrega los elementos que no estan ya en el hijo.
@@ -124,15 +145,16 @@ Algoritmo_Genetico/
 ### Formato normal (por defecto)
 
 ```
-Benchmark   Tiempo      Costo       Optimo  GAP GA (%)
+Benchmark   Tiempo      Costo       Optimo  GAP AM (%)
 berlin52.tsp  143ms     7701.4556   7542    2.11
-Configuracion GA: Pop=600, Gen=2000, Mut=0.3000, Tourn=3, Stag=200
+Configuracion AM: Pop=600, Gen=2000, Mut=0.3000, Tourn=3, Stag=200, Parents=3
+Convergencia: ultima mejora en gen 184, parada en gen 384 por stagnation_limit
 ```
 
 ### Formato plano (`-flat`)
 
-Columnas separadas por tab, sin encabezados (una linea):
+Columnas separadas por comas, sin encabezados (una linea):
 
 ```
-Archivo  Tiempo  Costo  Optimo  GAP  Pop  Gen  Mut  Tourn  Stag
+Archivo,Costo,Tiempo,Optimo,GAP,Pop,Gen,Mut,Tourn,Stag,Parents,GenUltimaMejora,GenParada,RazonParada
 ```

@@ -2,8 +2,8 @@ package geneticalgorithm
 
 import (
 	"math"
-	"tsp-ga/models"
-	"tsp-ga/utils"
+	"tsp-meme/models"
+	"tsp-meme/utils"
 )
 
 // FarthestInsertion builds a tour using the farthest insertion heuristic.

@@ -12,13 +12,13 @@ Implementacion de un Algoritmo Genetico (AG) para resolver el Problema del Viaja
 ```bash
 # Compilar
 cd Corte_3/Algoritmo_Genetico
-go build -o tsp-ga .
+go build -o tsp-meme .
 
 # Ejecutar con benchmark por defecto (berlin52)
-./tsp-ga
+./tsp-meme
 
 # Ejecutar con un benchmark especifico
-./tsp-ga ../Benchmark/eil76.tsp
+./tsp-meme ../Benchmark/eil76.tsp
 
 # Ejecutar sin compilar
 go run . ../Benchmark/kroA100.tsp
@@ -39,13 +39,13 @@ go run . ../Benchmark/kroA100.tsp
 
 ```bash
 # Configuracion personalizada
-./tsp-ga -pop 1000 -gen 800 -mut 0.25 -tourn 5 ../Benchmark/berlin52.tsp
+./tsp-meme -pop 1000 -gen 800 -mut 0.25 -tourn 5 ../Benchmark/berlin52.tsp
 
 # Desactivar parada por estancamiento
-./tsp-ga -stag 0 ../Benchmark/eil76.tsp
+./tsp-meme -stag 0 ../Benchmark/eil76.tsp
 
 # Salida plana (util para scripts y pipelines)
-./tsp-ga -flat ../Benchmark/kroA100.tsp
+./tsp-meme -flat ../Benchmark/kroA100.tsp
 ```
 
 ## Componentes del Algoritmo

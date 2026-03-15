@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"tsp-ga/models"
+	"tsp-meme/models"
 )
 
 // Funcion para leer el archivo TSP

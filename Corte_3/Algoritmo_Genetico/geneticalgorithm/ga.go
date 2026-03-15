@@ -3,8 +3,9 @@ package geneticalgorithm
 import (
 	"math/rand"
 	"sort"
-	"tsp-ga/models"
-	"tsp-ga/utils"
+	"tsp-meme/models"
+	"tsp-meme/utils"
+	"tsp-meme/localsearch"
 )
 
 // GAConfig holds the genetic algorithm parameters.
@@ -14,6 +15,7 @@ type GAConfig struct {
 	MutationRate   float64 // Mutation probability
 	TournamentSize int     // Tournament size for selection
 	StagnationLimit int    // Stop after this many generations without improvement (0 = disabled)
+	NumParents      int     // NUEVO: Número de padres para la recombinación (ej. 3)
 }
 
 // Individual represents a candidate solution (genotype: index permutation).
@@ -177,13 +179,36 @@ func RunGA(cities []models.City, config GAConfig) GAResult {
 			}
 
 			// Evaluate offspring
-			child1 := Individual{Tour: child1Tour, Cost: EvaluateCost(child1Tour, cities)}
-			child2 := Individual{Tour: child2Tour, Cost: EvaluateCost(child2Tour, cities)}
-
+			//child1 := Individual{Tour: child1Tour, Cost: EvaluateCost(child1Tour, cities)}
+			//child2 := Individual{Tour: child2Tour, Cost: EvaluateCost(child2Tour, cities)}
+			/*
 			offspring = append(offspring, child1)
 			if len(offspring) < config.PopSize {
 				offspring = append(offspring, child2)
 			}
+			*/
+
+			offspring := make([]Individual, 0, config.PopSize)
+
+			for len(offspring) < config.PopSize {
+				// 1. Seleccionar múltiples padres (Inciso A)
+				parents := make([][]int, config.NumParents)
+				for p := 0; p < config.NumParents; p++ {
+					parents[p] = TournamentSelection(population, config.TournamentSize).Tour
+				}
+
+				// 2. Cruce Multipadre DPX
+				childTour := DPXMultiParentCrossover(parents, cities) // Usamos nuestra nueva función DPX
+
+				// 3. Mutación (Double-Bridge)
+				if rand.Float64() < config.MutationRate {
+					childTour = DoubleBridgeMutation(childTour)
+				}
+
+				// 4. BÚSQUEDA LOCAL (EL NÚCLEO DEL ALGORITMO MEMÉTICO - Inciso B)
+				childTourOpt, childCost := localsearch.TwoOpt(childTour, cities)
+				// 5. Evaluar hijo YA OPTIMIZADO y añadirlo
+				offspring = append(offspring, Individual{Tour: childTourOpt, Cost: childCost})			}
 		}
 
 		// (μ+λ) survivor selection: merge population + offspring, keep best PopSize

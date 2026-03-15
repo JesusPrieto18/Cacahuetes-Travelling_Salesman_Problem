@@ -1,8 +1,8 @@
 package solver
 
 import (
-	"tsp-ga/geneticalgorithm"
-	"tsp-ga/models"
+	"tsp-meme/geneticalgorithm"
+	"tsp-meme/models"
 )
 
 // GeneticAlgorithmSolver executes the genetic algorithm on the given cities.

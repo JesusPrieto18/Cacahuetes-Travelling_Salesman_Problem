@@ -6,10 +6,10 @@ import (
 	"math/rand"
 	"path/filepath"
 	"time"
-	"tsp-ga/geneticalgorithm"
-	"tsp-ga/parser"
-	"tsp-ga/solver"
-	"tsp-ga/utils"
+	"tsp-meme/geneticalgorithm"
+	"tsp-meme/parser"
+	"tsp-meme/solver"
+	"tsp-meme/utils"
 )
 
 func main() {
@@ -20,6 +20,7 @@ func main() {
 	mut := flag.Float64("mut", 0.3, "Probabilidad de mutacion")
 	tourn := flag.Int("tourn", 3, "Tamaño del torneo para seleccion")
 	stag := flag.Int("stag", 200, "Generaciones sin mejora antes de parar (0 = desactivado)")
+	parents := flag.Int("parents", 3, "Numero de padres para recombinacion (>= 3)") 
 	flat := flag.Bool("flat", false, "Mostrar informacion en formato plano (sin encabezados)")
 
 	// Parsear los argumentos de la linea de comandos
@@ -47,11 +48,12 @@ func main() {
 		MutationRate:    *mut,
 		TournamentSize:  *tourn,
 		StagnationLimit: *stag,
+		NumParents:      *parents,
 	}
 
 	start := time.Now()
 
-	// 2. Ejecutar Algoritmo Genetico
+	// 2. Ejecutar Algoritmo Memético (antes Genético)
 	result := solver.GeneticAlgorithmSolver(ciudades, configGA)
 
 	elapsed := time.Since(start)
@@ -67,17 +69,17 @@ func main() {
 	nombreArchivo := filepath.Base(archivo)
 
 	if *flat {
-		fmt.Printf("%s,%.4f,%s,%.0f,%.2f,%d,%d,%.4f,%d,%d,%d,%d,%s\n",
+		fmt.Printf("%s,%.4f,%s,%.0f,%.2f,%d,%d,%.4f,%d,%d,%d,%d,%d,%s\n",
 			nombreArchivo, result.BestCost, elapsed, optimo, gapGA,
-			*pop, *gen, *mut, *tourn, *stag,
+			*pop, *gen, *mut, *tourn, *stag, *parents,
 			result.LastImproveGen, result.TotalGens, result.StopReason)
 	} else {
 		fmt.Printf("%-10s\t%-10s\t%-10s\t%-6s\t%-10s\n",
-			"Benchmark", "Tiempo", "Costo", "Optimo", "GAP GA (%)")
+			"Benchmark", "Tiempo", "Costo", "Optimo", "GAP AM (%)") 
 		fmt.Printf("%s\t%s\t%.4f\t%.0f\t%.2f\n",
 			nombreArchivo, elapsed, result.BestCost, optimo, gapGA)
-		fmt.Printf("Configuracion GA: Pop=%d, Gen=%d, Mut=%.4f, Tourn=%d, Stag=%d\n",
-			*pop, *gen, *mut, *tourn, *stag)
+		fmt.Printf("Configuracion AM: Pop=%d, Gen=%d, Mut=%.4f, Tourn=%d, Stag=%d, Parents=%d\n",
+			*pop, *gen, *mut, *tourn, *stag, *parents)
 		fmt.Printf("Convergencia: ultima mejora en gen %d, parada en gen %d por %s\n",
 			result.LastImproveGen, result.TotalGens, result.StopReason)
 	}

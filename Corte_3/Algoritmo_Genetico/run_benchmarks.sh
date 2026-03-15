@@ -6,7 +6,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BENCHMARK_DIR="${SCRIPT_DIR}/../Benchmark"
-BINARY="${SCRIPT_DIR}/tsp-ga"
+BINARY="${SCRIPT_DIR}/tsp-meme"
 OUTPUT="${SCRIPT_DIR}/resultados_ga.csv"
 
 # Parametros del AG (modificar aqui o pasar como variables de entorno)
@@ -19,7 +19,7 @@ STAG="${STAG:-200}"
 # Compilar si no existe el binario o si el codigo es mas nuevo
 if [ ! -f "$BINARY" ] || [ "$SCRIPT_DIR/main.go" -nt "$BINARY" ]; then
     echo "Compilando..."
-    cd "$SCRIPT_DIR" && go build -o tsp-ga . || { echo "ERROR: Fallo la compilacion"; exit 1; }
+    cd "$SCRIPT_DIR" && go build -o tsp-meme . || { echo "ERROR: Fallo la compilacion"; exit 1; }
 fi
 
 # Encabezado CSV

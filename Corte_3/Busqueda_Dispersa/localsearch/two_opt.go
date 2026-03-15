@@ -1,8 +1,8 @@
 package localsearch
 
 import (
-	"tsp-meme/models"
-	"tsp-meme/utils"
+	"tsp-ds/models"
+	"tsp-ds/utils"
 )
 
 // Funcion 2 opt para busqueda local (Adaptada y protegida contra bucles)

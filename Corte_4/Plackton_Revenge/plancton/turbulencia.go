@@ -6,29 +6,38 @@ import (
 	"tsp/utils"
 )
 
-// AplicarTurbulencia dispersa aleatoriamente una fracción (mu) de la población.
-// Modifica la población en su lugar y protege al individuo en el índice 0.
+// AplicarTurbulencia aplica una macro-mutación (Double Bridge) a una fracción de la población.
+// Esto permite escapar de óptimos locales sin crear rutas "basura" que mueran instantáneamente.
 func AplicarTurbulencia(poblacion []Plancton, mu float64, cities []models.City) {
 	nPop := len(poblacion)
 	turbCount := int(mu * float64(nPop))
+	nCities := len(cities)
 
-	// Si la población es muy pequeña o la intensidad es 0, omitimos la turbulencia
-	if turbCount == 0 || nPop < 2 {
+	// Si la población es muy pequeña o la intensidad es 0, omitimos
+	if turbCount == 0 || nPop < 2 || nCities < 8 {
 		return
 	}
 
-	nCities := len(cities)
-
 	for i := 0; i < turbCount; i++ {
-		// Elegir un índice aleatorio evitando el 0.
-		// rand.Intn(nPop-1) genera [0, nPop-2], al sumar 1 obtenemos [1, nPop-1].
-		// Esto protege al campeón si asumimos que la población fue ordenada previamente.
+		// Protegemos al campeón (índice 0)
 		idx := rand.Intn(nPop-1) + 1
 
-		// Reinicialización total usando rand.Perm nativo de Go
-		nuevoTour := rand.Perm(nCities)
+		// Tomamos como base la estructura del líder para no empezar desde cero (evitar muertes por costo alto)
+		baseTour := poblacion[0].Tour
 
-		// Actualizar el plancton arrastrado por la turbulencia
+		// Generamos 3 puntos de corte aleatorios para dividir la ruta en 4 segmentos
+		p1 := 1 + rand.Intn(nCities/4)
+		p2 := p1 + 1 + rand.Intn(nCities/4)
+		p3 := p2 + 1 + rand.Intn(nCities/4)
+
+		// Ensamblamos el Doble Puente: Segmentos [A, B, C, D] se convierten en [A, D, C, B]
+		nuevoTour := make([]int, 0, nCities)
+		nuevoTour = append(nuevoTour, baseTour[:p1]...)       // A
+		nuevoTour = append(nuevoTour, baseTour[p3:]...)       // D
+		nuevoTour = append(nuevoTour, baseTour[p2:p3]...)     // C
+		nuevoTour = append(nuevoTour, baseTour[p1:p2]...)     // B
+
+		// Actualizamos el plancton arrastrado por la turbulencia
 		poblacion[idx].Tour = nuevoTour
 		poblacion[idx].Cost = utils.CalcularCostoPermutacion(nuevoTour, cities)
 	}

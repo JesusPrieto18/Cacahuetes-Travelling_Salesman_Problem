@@ -70,8 +70,13 @@ func EjecutarOFP(oceano utils.Oceano, config OFPConfig) OFPResult {
 			lastImprove = t + 1
 		}
 
-		// Enfriamiento del paso quimiotáctico (simula movimientos más finos)
+		// Enfriamiento del paso quimiotáctico
 		deltaActual *= config.Gamma
+		
+		// Límite inferior: garantizar siempre una búsqueda local mínima
+		if deltaActual < 50.0 {
+			deltaActual = 50.0
+		}
 	}
 
 	// Traducir el genotipo (permutación de índices) al fenotipo (slice de ciudades)

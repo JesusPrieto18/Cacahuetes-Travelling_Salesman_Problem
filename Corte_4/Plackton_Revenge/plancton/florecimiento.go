@@ -32,15 +32,21 @@ func AplicarFlorecimiento(poblacion []Plancton, B float64, cities []models.City)
 	// 2. Reproducción de la élite
 	for i := 0; i < eliteCount; i++ {
 		padre := poblacion[i]
-		// Usamos la utilidad pública para copiar la ruta de forma segura
 		tourHijo := utils.CopiarPermutacion(padre.Tour)
 
-		// Mutación mínima: un único swap aleatorio para buscar en la vecindad inmediata
-		idx1 := rand.Intn(nCities)
-		idx2 := rand.Intn(nCities)
-		tourHijo[idx1], tourHijo[idx2] = tourHijo[idx2], tourHijo[idx1]
+		// Perturbación topológica (Inversión de sub-ruta en lugar de Swap)
+		// Elegimos dos puntos al azar
+		p1 := rand.Intn(nCities-1)
+		p2 := rand.Intn(nCities-p1-1) + p1 + 1
 
-		// Crear el nuevo plancton y evaluar su costo con tu utilidad centralizada
+		// Invertimos el segmento para crear el hijo
+		a, b := p1, p2
+		for a < b {
+			tourHijo[a], tourHijo[b] = tourHijo[b], tourHijo[a]
+			a++
+			b--
+		}
+
 		hijo := Plancton{
 			Tour: tourHijo,
 			Cost: utils.CalcularCostoPermutacion(tourHijo, cities),
